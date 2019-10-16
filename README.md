@@ -67,6 +67,9 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
     * GRU：将遗忘门和输入门合并成为单一的“更新门”。相对 LSTM 引入了更少的参数，所以网络不容易过拟合。
 
 * Method2 -- G
+    使用由Allamanis等人提出的程序图方法，将程序转化为图，并用一个虚拟节点代替目标表达式。运行GNN以获得上下文和“洞”（即目标表达式）的所有变量表示。
+    GNN是运行在图上的神经网络算法，其典型应用是节点分类，它将学习所有包含特征的节点然后用一个包含邻域信息的d维向量来hv来表示节点，从而利用这些标记预测其余节点的分类。本文作者使用此网络的前半部分，运行GNN8步，以获得所需上下文和目标表达式的表示。
+    >We then run a graph neural network for 8 steps to obtain representations for all nodes in the graph, allowing us to read out a representation for the “hole” (from the introduced dummy node) and for all variables in context.
 
 ### decoder
 
