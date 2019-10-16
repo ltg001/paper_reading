@@ -40,9 +40,29 @@
    因为语法树保证了语法信息的正确性，所以可以通过目标语言的语法来构建抽象语法树来解决语法信息的正确问题。
    > using the target language’s grammar to generate abstract syntax trees
 
-    **TODO** 图示
+    **TODO** 图示  
+
+    本文使用了建立抽象语法树的基本思路，并依据编程语言的语法来有序扩展语法树，通过每次扩展语法树最底层，最左边的非终结节点来有序构造。因为每次扩展的节点的相对位置一定，所以作者将代码产生问题简化为了树扩展序列的分类问题。
+    > The key idea is to construct the AST a sequentially, by expanding one node at a time using production rules from the underlying programming language grammar. This simpliﬁes the code generation task to a sequence of classiﬁcation problems ...
 
 ## 方案
+
+本文使用了经典的 encoder-decoder 结构，将提取到的上下文信息先表示为一个向量，再逐步将其展开并生成目标代码。原理图如下：
+
+![img](model_sketch.png)
+
+### encoder
+
+* Method1 -- Seq
+    使用 NLP 领域中经典的信息抽取方式 Seq 使用两层双向的 GRU 单元来学习代码空缺处的上下文信息。  
+    作者使用了第二个上述的结构来学习变量在空缺前后的变化特征，并使用了上述结构来进行变量的表示学习，即将第二层的 GRU 最终状态信息经过平均池化后作为每个变量的向量表示。所以每一层的 GRU 单元数就是描述变量的个数。  
+    ![img](seq.png) // **TODO** 换张图表示嵌入
+
+  * 为什么使用 GRU **TODO** complete
+
+* Method2 -- G
+
+### decoder
 
 ## 原理
 
