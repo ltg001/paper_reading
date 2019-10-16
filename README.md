@@ -1,9 +1,9 @@
 # Generative Code Modeling With Graphs
 
-题目：Generative Code Modeling With Graphs
-作者：MarcBrockschmidt, MiltiadisAllamanis, AlexanderGaunt, OleksandrPolozov
-单位：Microsift Research
-出版：ICLR-2019
+题目：Generative Code Modeling With Graphs  
+作者：MarcBrockschmidt, MiltiadisAllamanis, AlexanderGaunt, OleksandrPolozov  
+单位：Microsift Research  
+出版：ICLR-2019  
 
 ## 问题
 
