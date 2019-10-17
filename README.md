@@ -47,14 +47,23 @@
 
 ## 方案
 
-本文使用了经典的 encoder-decoder 结构，将提取到的上下文信息先表示为一个向量，再逐步将其展开并生成目标代码。原理图如下：
+### 系统架构
+本文使用了经典的 encoder-decoder 结构，将提取到的上下文信息先表示为一个向量，再逐步将其展开并生成目标代码。  
+
+**TODO** 假设和使用方案的动机
+
+## 原理
+
+### encoder--decoder模型
+
+原理如图：
 
 ![img](model_sketch.png)
 
 此结构同样保证了在生成 t 时刻的信息时考虑到前 t-1 时刻的信息，因为 decoder 同样使用了 RNN 的结构，保证了表示 t 时刻的单元接受到了前 t-1 时刻的状态信息，而在开始进行 decode 之前，encoder 已经提取出了上下文信息 c 并将其传入了 decoder。即原文中表述的公式：
 $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
 
-### encoder
+#### encoder
 
 * Method1 -- Seq  
     使用 NLP 领域中经典的信息抽取方式 Seq 使用两层双向的 GRU 单元来学习代码空缺处的上下文信息。使用双向的 GRU 单元同时学习空缺前和空缺后的语义信息，选取最后一个单元的状态信息作为传入的上下文信息 c。  
@@ -70,10 +79,8 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
     使用由Allamanis等人提出的程序图方法，将程序转化为图，并用一个虚拟节点代替目标表达式。运行GNN以获得上下文和“洞”（即目标表达式）的所有变量表示。
     GNN是运行在图上的神经网络算法，其典型应用是节点分类，它将学习所有包含特征的节点然后用一个包含邻域信息的d维向量来hv来表示节点，从而利用这些标记预测其余节点的分类。本文作者使用此网络的前半部分，运行GNN8步，以获得所需上下文和目标表达式的表示。
     >We then run a graph neural network for 8 steps to obtain representations for all nodes in the graph, allowing us to read out a representation for the “hole” (from the introduced dummy node) and for all variables in context.
-
-### decoder
-
-## 原理
+    
+#### decoder
 
 ## 实现
 
