@@ -48,7 +48,9 @@
 ## 方案
 
 ### 系统架构
-本文使用了经典的 encoder-decoder 结构，将提取到的上下文信息先表示为一个向量，再逐步将其展开并生成目标代码。  
+   本文使用了经典的 encoder-decoder 结构，将提取到的上下文信息先表示为一个向量，再逐步将其展开并生成目标代码。encoder非本文所解决问题，本文选择seq和G两种encoder方式，decoder则使用AST generating model，作者结合属性文法，将AST节点和代表继承属性和综合属性的节点连接形成图，最后使用GNN学习此图。
+   >We associate each node in the AST with two fresh nodes representing inherited resp. synthesized information (or attributes).
+   >Our method for getRepresentation from Alg. 1 thus factors into two parts: a deterministic procedure that turns a partial AST a<t into a graph by adding additional edges that encode attribute relationships, and a graph neural network that learns from this graph.
 
 **TODO** 假设和使用方案的动机
 
