@@ -84,6 +84,9 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
 
 ## 实现
 
+   使用语言与平台为TensorFlow，所生成代码为C#。[代码github](https://github.com/Microsoft/graph-based-code-modelling)
+   >We have released the code for this on https://github.com/Microsoft/graph-based-code-modelling.
+
 ## 评价
 
 ## 局限
