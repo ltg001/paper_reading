@@ -84,4 +84,7 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
 1. 产生代码的类型受限，不支持用户自定的类型。
    >  we restrict ourselves to expressions that have Boolean, arithmetic or string type, or arraysof such types, excluding expressions of other typesor expressionsthat use project-speciﬁc APIs
 
+2. 使用环境受到局限，将训练过模型转移至一个新的词汇集将明显使得结果变糟。
+   >Transferring a trained model to unseen projects with a new project-specific vocabulary substantially worsens results, as expected.
+
 ## 展望
