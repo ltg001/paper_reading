@@ -87,6 +87,7 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
     > We then run a graph neural network for 8 steps to obtain representations for all nodes in the graph, allowing us to read out a representation for the “hole” (from the introduced dummy node) and for all variables in context.
 
 #### decoder
+
    本文选择使用 AST 生成算法，构建一棵 AST 树，每次将最左最下的非终结节点扩张。
    >by fixing the order of the sequence to always expand the left-most, bottom-most nonterminal node. 
    
@@ -98,6 +99,13 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
    
    ![img](pac.png)
    
+   本文算法的主要区别在于如何计算表示（representation），作者的使用图来建立信息流的模型，选用属性文法来构建此图————作者将 AST 的每一个节点和两个其他节点（分别代表继承属性信息和综合属性信息）连接，形成图。
+   >We propose to generalize and unify these ideas using a graph to structure the flow of information in the model. Concretely, we use a variation of attribute grammars (Knuth, 1967) from compiler theory to derive the structure of this graph. We associate each node in the AST with two fresh nodes representing inherited resp. synthesized information (or attributes).
+   
+   * 属性文法：来自原编译原理的概念，属性文法是在上下文无关文法的基础上为每个符号配备若干个值（称为属性）。属性分为两种：
+     * 继承属性（inherited）：自上而下传递信息，一个节点的继承属性由其父节点和兄弟节点的某些值确定。
+     * 综合属性（synthesized）：自下而上传递信息，一个节点的综合属性由其子节点的属性决定。
+
 ## 实现
 
    使用语言与平台为TensorFlow，所生成代码为C#。[代码github](https://github.com/Microsoft/graph-based-code-modelling)
