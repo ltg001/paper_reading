@@ -99,7 +99,7 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
    
    ![img](pac.png)
    
-   本文算法的主要区别在于如何计算表示（representation），作者的使用图来建立信息流的模型，选用属性文法来构建此图————作者将 AST 的每一个节点和两个其他节点（分别代表继承属性信息和综合属性信息）连接，形成图。
+   本文算法的主要区别在于如何计算表示（representation），作者的使用图来建立信息流的模型，选用属性文法来构建此图————作者将 AST 的每一个节点和两个其他节点（分别代表继承属性信息和综合属性信息）连接，形成图。最后通过 GNN 学习此图。
    >We propose to generalize and unify these ideas using a graph to structure the flow of information in the model. Concretely, we use a variation of attribute grammars (Knuth, 1967) from compiler theory to derive the structure of this graph. We associate each node in the AST with two fresh nodes representing inherited resp. synthesized information (or attributes).
    
    * 属性文法：来自原编译原理的概念，属性文法是在上下文无关文法的基础上为每个符号配备若干个值（称为属性）。属性分为两种：
@@ -109,6 +109,16 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
    计算边的算法：
    
    ![img](Alg2.png)
+   
+   为实现 Alg1 中的 getRepresentation 函数，计算神经网络节点v的属性 hv （在AST中被标注为 lv 的节点），作者首先计算指向此节点的边的数量，然后使用 GGNN 的状态更新函数。
+   >To compute the neural attribute representation hv of an attribute node v whose corresponding AST node is labeled with lv, we first obtain its incoming edges using Alg. 2 and then use the state update function from Gated Graph Neural Networks (GGNN) (Li et al.,
+2016).
+
+   * GGNN——门控图神经网络
+     * GGNN是一种基于GRU的经典的空间域message passing的模型，实现每一次参数更新时，每个节点既接受相邻节点的信息，又向相邻节点发送信息。
+       GGNN图示：
+       
+       ![img](GGNN.png)
 
 ## 实现
 
