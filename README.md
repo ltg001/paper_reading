@@ -87,7 +87,15 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
     > We then run a graph neural network for 8 steps to obtain representations for all nodes in the graph, allowing us to read out a representation for the “hole” (from the introduced dummy node) and for all variables in context.
 
 #### decoder
-
+   本文选择使用 AST 生成算法，构建一棵 AST 树，每次将最左最下的非终结节点扩张。
+   >by fixing the order of the sequence to always expand the left-most, bottom-most nonterminal node. 
+   
+   AST 生成算法：
+   ![img](Alg1.png)
+   
+   生成 AST a 的概率：
+   ![img](Pac.png)
+   
 ## 实现
 
    使用语言与平台为TensorFlow，所生成代码为C#。[代码github](https://github.com/Microsoft/graph-based-code-modelling)
