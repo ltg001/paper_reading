@@ -95,10 +95,6 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
 
    ![img](Alg1.png)
 
-   生成 AST a 的概率：
-
-   ![img](pac.png)
-
    本文算法的主要区别在于如何通过计算生成语法树节点的表示，作者的使用图来建立信息流的模型，选用属性文法来构建此图。作者将 AST 的每一个节点和两个其他节点（分别代表继承属性信息和综合属性信息）连接，形成图。最后通过 GNN 学习此图。
    > We propose to generalize and unify these ideas using a graph to structure the flow of information in the model. Concretely, we use a variation of attribute grammars (Knuth, 1967) from compiler theory to derive the structure of this graph. We associate each node in the AST with two fresh nodes representing inherited resp. synthesized information (or attributes).
 
