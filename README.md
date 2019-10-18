@@ -89,48 +89,48 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
 #### decoder
 
    本文选择使用 AST 生成算法，构建一棵 AST 树，每次将最左最下的非终结节点扩张。
-   >by fixing the order of the sequence to always expand the left-most, bottom-most nonterminal node. 
-   
+   > by fixing the order of the sequence to always expand the left-most, bottom-most nonterminal node.
+
    AST 生成算法：
-   
+
    ![img](Alg1.png)
-   
+
    生成 AST a 的概率：
-   
+
    ![img](pac.png)
-   
-   本文算法的主要区别在于如何计算表示（representation），作者的使用图来建立信息流的模型，选用属性文法来构建此图————作者将 AST 的每一个节点和两个其他节点（分别代表继承属性信息和综合属性信息）连接，形成图。最后通过 GNN 学习此图。
-   >We propose to generalize and unify these ideas using a graph to structure the flow of information in the model. Concretely, we use a variation of attribute grammars (Knuth, 1967) from compiler theory to derive the structure of this graph. We associate each node in the AST with two fresh nodes representing inherited resp. synthesized information (or attributes).
-   
-   * 属性文法：来自原编译原理的概念，属性文法是在上下文无关文法的基础上为每个符号配备若干个值（称为属性）。属性分为两种：
-     * 继承属性（inherited）：自上而下传递信息，一个节点的继承属性由其父节点和兄弟节点的某些值确定。
-     * 综合属性（synthesized）：自下而上传递信息，一个节点的综合属性由其子节点的属性决定。
-   
+
+   本文算法的主要区别在于如何通过计算生成语法树节点的表示，作者的使用图来建立信息流的模型，选用属性文法来构建此图。作者将 AST 的每一个节点和两个其他节点（分别代表继承属性信息和综合属性信息）连接，形成图。最后通过 GNN 学习此图。
+   > We propose to generalize and unify these ideas using a graph to structure the flow of information in the model. Concretely, we use a variation of attribute grammars (Knuth, 1967) from compiler theory to derive the structure of this graph. We associate each node in the AST with two fresh nodes representing inherited resp. synthesized information (or attributes).
+
+* 属性文法：来自原编译原理的概念，属性文法是在上下文无关文法的基础上为每个符号配备若干个值（称为属性）。属性分为两种：
+  * 继承属性（inherited）：自上而下传递信息，一个节点的继承属性由其父节点和兄弟节点的某些值确定。
+  * 综合属性（synthesized）：自下而上传递信息，一个节点的综合属性由其子节点的属性决定。
+
    计算边的算法：
-   
+
    ![img](Alg2.png)
-   
+
    为实现 Alg1 中的 getRepresentation 函数，计算神经网络节点v的属性 hv （在AST中被标注为 lv 的节点），作者首先计算指向此节点的边的数量，然后使用 GGNN 的状态更新函数。
-   >To compute the neural attribute representation hv of an attribute node v whose corresponding AST node is labeled with lv, we first obtain its incoming edges using Alg. 2 and then use the state update function from Gated Graph Neural Networks (GGNN) (Li et al.,
+   > To compute the neural attribute representation hv of an attribute node v whose corresponding AST node is labeled with lv, we first obtain its incoming edges using Alg. 2 and then use the state update function from Gated Graph Neural Networks (GGNN) (Li et al.,
 2016).
 
-   * GGNN ——门控图神经网络
-     * GGNN 是一种基于 GRU 的经典的空间域 message passing 的模型，实现每一次参数更新时，每个节点既接受相邻节点的信息，又向相邻节点发送信息。
+* GGNN ——门控图神经网络
+  * GGNN 是一种基于 GRU 的经典的空间域 message passing 的模型，实现每一次参数更新时，每个节点既接受相邻节点的信息，又向相邻节点发送信息。
        GGNN 图示：
-       
+
        ![img](GGNN.png)
-       
+
        属性 hv 公式：
-       
+
        ![img](1.png)
-       
+
        其中 g 函数是 GGNN 的节点输出函数， 左边的参数是节点初态，右边参数是节点输入特征。
-       
+
        **TODO** 解释公式中的 emb() 和 f()
 
 ## 实现
 
-   使用语言与平台为TensorFlow，所生成代码为C#。[代码github](https://github.com/Microsoft/graph-based-code-modelling)
+   实现使用框架为 TensorFlow，所生成代码为 C#。[代码github](https://github.com/Microsoft/graph-based-code-modelling)
    > We have released the code for this on https://github.com/Microsoft/graph-based-code-modelling.
 
 ### 模型构建
