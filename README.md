@@ -91,10 +91,12 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
    >by fixing the order of the sequence to always expand the left-most, bottom-most nonterminal node. 
    
    AST 生成算法：
+   
    ![img](Alg1.png)
    
    生成 AST a 的概率：
-   ![img](Pac.png)
+   
+   ![img](pac.png)
    
 ## 实现
 
