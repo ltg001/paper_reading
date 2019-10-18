@@ -114,11 +114,18 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
    >To compute the neural attribute representation hv of an attribute node v whose corresponding AST node is labeled with lv, we first obtain its incoming edges using Alg. 2 and then use the state update function from Gated Graph Neural Networks (GGNN) (Li et al.,
 2016).
 
-   * GGNN——门控图神经网络
-     * GGNN是一种基于GRU的经典的空间域message passing的模型，实现每一次参数更新时，每个节点既接受相邻节点的信息，又向相邻节点发送信息。
-       GGNN图示：
+   * GGNN ——门控图神经网络
+     * GGNN 是一种基于 GRU 的经典的空间域 message passing 的模型，实现每一次参数更新时，每个节点既接受相邻节点的信息，又向相邻节点发送信息。
+       GGNN 图示：
        
        ![img](GGNN.png)
+       
+       属性 hv 公式：
+       
+       ![img](1.png)
+       
+       其中 g 函数是 GGNN 的节点输出函数， 左边的参数是节点初态，右边参数是节点输入特征。
+       **TODO** 解释公式中的 emb() 和 f()
 
 ## 实现
 
