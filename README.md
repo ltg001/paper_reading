@@ -62,8 +62,27 @@
   
     ![img](summarize.png )
   
-##  方案
+## 前置知识
+
+### 嵌入 embedding
+
+embedding(Index)函数为参考嵌入层（Embedding layer）而构造学习的一个单射的映射函数。其目的在于把正整数（Index）转换为固定大小的稠密向量，需要指出的是嵌入向量的长度是一个超参数，不可训练。如果向量维数过低，可能造成不同向量间的距离过近，引入有歧义的语义信息。如果向量维数过高，可能加大计算量，降维的效果不明显。
+
+* 使用 embedding 的原因
+  * 独热编码（One-hot encoding）向量是**高维且稀疏的**。对于序列数量较多情况下，使用独热编码时，所映射成的向量中有num-1个元素都为0（num为序列数），在大数据集下使用这种方法的计算效率是很低的。
+  * 每个嵌入向量会在训练神经网络时更新。对于任何能够通过使用嵌入层而把它变成向量的东西，为了方便计算，进行向量映射是明智的选择。
+
+* Embedding作用在词语上的一个例子：
+    > “deep learning is very deep”
   
+  * 使用嵌入层的第一步是通过索引对这个句子进行编码，在这个例子里，我们给句中每个不同的词一个数字索引，编码后的句子如下所示：
+    > 1 2 3 4 1
+  
+  * 下一步是创建嵌入矩阵。我们要决定每个索引有多少“潜在因素”，这就是说，我们需要决定词向量的长度。一般我们会使用像 32 或者 50 这样的长度。出于可读性的考虑，假设我们每个索引的“潜在因素”个数有 6 个。那么嵌入矩阵就如下图所示：
+    ![img](embedding-matrix.png )
+    所以 和独热编码中每个词向量的长度相比，使用嵌入矩阵能够让每个词向量的长度大幅缩短。简而言之，我们用一个向量 [0.32, 0.02, 0.48, 0.21, 0.56, 0.15]来代替了词语 “deep”。然而并不是每个词被一个向量所代替，而是由其索引在嵌入矩阵中对应的向量代替。
+
+##  方案
   
 ###  系统架构
   
@@ -113,9 +132,8 @@
     > We then run a graph neural network for 8 steps to obtain representations for all nodes in the graph, allowing us to read out a representation for the “hole” (from the introduced dummy node) and for all variables in context.
   
 ####   decoder
-  
-  
-   本文选择使用 AST 生成算法，构建一棵 AST 树，每次将最左最下的非终结节点扩张。
+
+   本文选择使用 AST 生成算法，构建一棵 AST 树，每次将最左最下的非终结节点扩张，在构建树的同时进行建图操作。
    > by fixing the order of the sequence to always expand the left-most, bottom-most nonterminal node.
   
    AST 生成算法：
@@ -151,23 +169,9 @@
   
         其中 <img src="https://latex.codecogs.com/gif.latex?h_{u_i}"/> 表示起源于节点 <img src="https://latex.codecogs.com/gif.latex?u_i"/> 的边的向量表示，因为点的标注的嵌入长度和边的嵌入的长度可能不相等，需要训练一个线性层来进行从边的嵌入空间到标注的嵌入空间的转换，但是边的类型不同，在嵌入边时空间也不同，因此每个类型的边需要不同的矩阵来进行转换。
         上面所说的 label 信息实际上是当前节点上个时刻对这个时刻造成的影响，使用相关的边的向量的和来描述其他节点对当前节点的影响。函数 g 的实际作用在于刻画 GNN 传播的聚合操作，使用 GRU 单元来描述这个时序信息。
-  
-    * emb(Index)函数为参考嵌入层（Embedding layer）而构造学习的一个单射的映射函数。其目的在于把正整数（Index）转换为固定大小的**稠密向量**。
-    * **这里使用emb函数的原因主要有两个：**
-      * 独热编码（One-hot encoding）向量是**高维且稀疏的**。对于序列数量较多情况下，使用独热编码时，所映射成的向量中有num-1个元素都为0（num为序列数），在大数据集下使用这种方法的计算效率是很低的。
-      * 每个嵌入向量会在训练神经网络时更新。对于任何能够通过使用嵌入层而把它变成向量的东西，为了方便计算，进行向量映射是明智的选择。
-        * **Embedding作用在词语上的一个例子：**
-            > “deep learning is very deep”
-  
-        * 使用嵌入层的第一步是通过索引对这个句子进行编码，在这个例子里，我们给句中每个不同的词一个数字索引，编码后的句子如下所示：
-            > 1 2 3 4 1
-  
-        * 下一步是创建嵌入矩阵。我们要决定每个索引有多少“潜在因素”，这就是说，我们需要决定词向量的长度。一般我们会使用像 32 或者 50 这样的长度。出于可读性的考虑，假设我们每个索引的“潜在因素”个数有 6 个。那么嵌入矩阵就如下图所示：
-            ![img](embedding-matrix.png )
-          所以，和独热编码中每个词向量的长度相比，使用嵌入矩阵能够让每个词向量的长度大幅缩短。简而言之，我们用一个向量 [.32, .02, .48, .21, .56, .15]来代替了词语“deep”。然而并不是每个词被一个向量所代替，而是由其索引在嵌入矩阵中对应的向量代替。
-      * f 函数是通过学习得到的一个映射函数，它的作用是：
-        * 输入一条边的源结点的属性表示 <img src="https://latex.codecogs.com/gif.latex?h_{ui}"/> (以 <img src="https://latex.codecogs.com/gif.latex?u_i"/> 为源结点)
-        * 输出其对应的边缘类型 <img src="https://latex.codecogs.com/gif.latex?t_i"/>
+    * f 函数是通过学习得到的一个映射函数，它的作用是：
+      * 输入一条边的源结点的属性表示 <img src="https://latex.codecogs.com/gif.latex?h_{ui}"/> (以 <img src="https://latex.codecogs.com/gif.latex?u_i"/> 为源结点)
+      * 输出其对应的边缘类型 <img src="https://latex.codecogs.com/gif.latex?t_i"/>
   
 * 边的表示
     本文中作者使用了一个三元组表示一条有属性的有向边。<img src="https://latex.codecogs.com/gif.latex?&#x5C;lang%20u,t,v%20&#x5C;rang"/> 表示属性为 <img src="https://latex.codecogs.com/gif.latex?t"/> 的从节点 <img src="https://latex.codecogs.com/gif.latex?u"/> 指向节点 <img src="https://latex.codecogs.com/gif.latex?v"/> 的有向边。使用边的属性表示上述的属性文法，通过设置该域为 Child, NextToken 等值描述不同信息流动的方向。需要注意的是对于不同类型的边描述的信息类型不同，在进行向量表示时需要嵌入不同的空间。
@@ -209,8 +213,6 @@
   
 ###   模型构建
   
-  
-  
 ##   评价
   
   本文的模型为nag，作者考虑了四个度量，分别为：pre-token 困惑度，生成基本事实表达式的频率，生成的表达式类型正确的频率（束率为1和5），通过这四个指标，作者将本模型和之前的 asn tree模型作比较。并设置了两组使用不同编码器（g 和 seq）的比较组。
@@ -224,11 +226,10 @@
   
   本文作者经过比较得出：ExprGen任务是个十分困难的任务，最强的模型正确率也未能在预测中达到50%。而神经网络模型的性能要好于传统模型。本文的模型可以更好地理解上下文中不同变量的关系，而 asn 模型则难以理解两个不同变量之间的关系。如图：
   
-  ![img](result.png)
+  ![img](result.png) **TODO** 截图的上面有一点绿色 & 需要解读任务
   
 ##   局限
-  
-  
+
   
 1. 产生代码的类型受限，不支持用户自定的类型。
    > we restrict ourselves to expressions that have Boolean, arithmetic or string type, or arraysof such types, excluding expressions of other typesor expressionsthat use project-speciﬁc APIs
