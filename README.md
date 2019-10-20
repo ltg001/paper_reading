@@ -52,7 +52,6 @@
   
     本文使用了建立抽象语法树的基本思路，并依据编程语言的语法来有序扩展语法树，通过每次扩展语法树最底层，最左边的非终结节点来有序构造。因为每次扩展的节点的相对位置一定，所以作者将代码产生问题简化为了树扩展序列的分类问题。
     > The key idea is to construct the AST a sequentially, by expanding one node at a time using production rules from the underlying programming language grammar. This simpliﬁes the code generation task to a sequence of classiﬁcation problems ...
-<<<<<<< HEAD
 
     ![img](summarize.png)
 
@@ -60,15 +59,6 @@
 
 ### 系统架构
 
-=======
-  
-##  方案
-  
-  
-###  系统架构
-  
-  
->>>>>>> e1dc08cf6e4966f64c6f1fe34b814c441d939272
    本文使用了经典的 encoder-decoder 结构，将提取到的上下文信息先表示为一个向量，再逐步将其展开并生成目标代码。encoder 非本文所解决问题，本文选择 seq 和 G 两种encode 方式，decoder则使用改良的 AST generating model，作者结合属性文法，将AST 节点和代表继承属性和综合属性的节点连接形成图，最后使用GNN学习此图来进行代码生成。
   
    > We associate each node in the AST with two fresh nodes representing inherited resp. synthesized information (or attributes).
