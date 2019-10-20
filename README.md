@@ -1,15 +1,15 @@
 # Generative Code Modeling With Graphs
 
-题目：Generative Code Modeling With Graphs  
-作者：MarcBrockschmidt, MiltiadisAllamanis, AlexanderGaunt, OleksandrPolozov  
-单位：Microsift Research  
-出版：ICLR-2019  
+题目：Generative Code Modeling With Graphs
+作者：MarcBrockschmidt, MiltiadisAllamanis, AlexanderGaunt, OleksandrPolozov
+单位：Microsift Research
+出版：ICLR-2019
 
 ## 问题
 
 **TODO** 为每个任务配上例子
 
-主要任务：根据给出的上下文信息 c 来产生符合相应描述的代码段。  
+主要任务：根据给出的上下文信息 c 来产生符合相应描述的代码段。
 
 > The most general form of the code generation task is to produce a (partial) program in a programming language given some context information c.
 
@@ -24,27 +24,27 @@
 
 ### 研究背景
 
-1. 基于自然语言和形式语言的研究  
-   自然语言类似的方法可以在源代码上取得一定的效果。在软件工程和语义分析上取得一定成就。  
+1. 基于自然语言和形式语言的研究
+   自然语言类似的方法可以在源代码上取得一定的效果。在软件工程和语义分析上取得一定成就。
    > shown successes on important software engineering tasks(Raychevetal.,2015;Bichseletal.,2016; Allamanis et al., 2018b) and semantic parsing (Yin & Neubig, 2017; Rabinovich et al., 2017).
 
-   **TODO** 取得什么成就 & 评价指标  
+   **TODO** 取得什么成就 & 评价指标
 
     * 缺陷：只能满足部分语法要求，不能区分给定训练样本中的相似程序的不同之处。上下文的语义信息有缺失。
         > as they cannot distinguish unlikely from likely
         > sometimes fail to produce syntactically correct code
 
     **TODO** 反例
-    * 基于枚举和演绎的程序综合工具成功地生成了满足某些（通常是不完整）形式的规范程序，但是在人工手动检查中通常显然是错误的，因为它们无法将可能的程序与可能的“自然”程序区分开。 
-        > For example, program synthesis tools based on enumeration and deduction (Solar-Lezama, 2008; Polozov & Gulwani, 2015; Feser et al., 2015; Feng et al., 2018) are successful at generating programs that satisfy some (usually incomplete) formal speciﬁcation but are often obviously wrong on manual inspection, as they cannot distinguish unlikely from likely, “natural” programs. 
+    * 基于枚举和演绎的程序综合工具成功地生成了满足某些（通常是不完整）形式的规范程序，但是在人工手动检查中通常显然是错误的，因为它们无法将可能的程序与可能的“自然”程序区分开。
+        > For example, program synthesis tools based on enumeration and deduction (Solar-Lezama, 2008; Polozov & Gulwani, 2015; Feser et al., 2015; Feng et al., 2018) are successful at generating programs that satisfy some (usually incomplete) formal speciﬁcation but are often obviously wrong on manual inspection, as they cannot distinguish unlikely from likely, “natural” programs.
     * 另一方面，学习后的代码模型能够成功生成十分逼真的程序。 但是，这些程序经常在语义上并不相关，例如，因为变量使用并不统一。
-        > On the otherhand,learned code models have succeeded in generating realistic-looking programs(Maddison & Tarlow, 2014; Bielik et al., 2016; Parisotto et al., 2017; Rabinovich et al., 2017; Yin & Neubig, 2017). However,these programs often fail to be semantically relevant,for example because variables are not used consistently. 
+        > On the otherhand,learned code models have succeeded in generating realistic-looking programs(Maddison & Tarlow, 2014; Bielik et al., 2016; Parisotto et al., 2017; Rabinovich et al., 2017; Yin & Neubig, 2017). However,these programs often fail to be semantically relevant,for example because variables are not used consistently.
 
 2. 抽象语法树相关的研究
    因为语法树保证了语法信息的正确性，所以可以通过目标语言的语法来构建抽象语法树来解决语法信息的正确问题。
    > using the target language’s grammar to generate abstract syntax trees
 
-   ![img](AST.png)  
+   ![img](AST.png)
 
     本文使用了建立抽象语法树的基本思路，并依据编程语言的语法来有序扩展语法树，通过每次扩展语法树最底层，最左边的非终结节点来有序构造。因为每次扩展的节点的相对位置一定，所以作者将代码产生问题简化为了树扩展序列的分类问题。
     > The key idea is to construct the AST a sequentially, by expanding one node at a time using production rules from the underlying programming language grammar. This simpliﬁes the code generation task to a sequence of classiﬁcation problems ...
@@ -75,9 +75,9 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
 
 **TODO** 确认一下两种 method 的名称是否准确 尽量使用引用文章中的名字
 
-* Method1 -- Seq  
-    使用 NLP 领域中经典的信息抽取方式 Seq 使用两层双向的 GRU 单元来学习代码空缺处的上下文信息。使用双向的 GRU 单元同时学习空缺前和空缺后的语义信息，选取最后一个单元的状态信息作为传入的上下文信息 c。  
-    作者使用了第二个上述的结构来学习变量在空缺前后的变化特征，并使用了上述结构来进行变量的表示学习，即将第二层的 GRU 最终状态信息经过平均池化后作为每个变量的向量表示。所以每一层的 GRU 单元数就是描述变量的个数。  
+* Method1 -- Seq
+    使用 NLP 领域中经典的信息抽取方式 Seq 使用两层双向的 GRU 单元来学习代码空缺处的上下文信息。使用双向的 GRU 单元同时学习空缺前和空缺后的语义信息，选取最后一个单元的状态信息作为传入的上下文信息 c。
+    作者使用了第二个上述的结构来学习变量在空缺前后的变化特征，并使用了上述结构来进行变量的表示学习，即将第二层的 GRU 最终状态信息经过平均池化后作为每个变量的向量表示。所以每一层的 GRU 单元数就是描述变量的个数。
     ![img](seq.png) // **TODO** 换张图表示嵌入
 
   * 为什么使用 GRU?
@@ -85,7 +85,7 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
     * LSTM：可以在解决梯度消失和梯度爆炸的问题，还可以从语料中学习到长期依赖关系。但是参数较多，不容易训练且容易过拟合。
     * GRU：将遗忘门和输入门合并成为单一的“更新门”，在拥有 LSTM 网络功能的基础上进行了适当的简化。相对 LSTM 引入了更少的参数，所以网络不容易过拟合且易于训练。
 
-* Method2 -- G  
+* Method2 -- G
     基于由 Allamanis 等人提出的程序图方法，将程序转化为图，并用一个虚拟节点代替目标表达式。通过 GNN 获得上下文和填空区域（即目标表达式）的所有变量表示。
     其中 GNN 是运行在图上的神经网络算法，其典型应用是节点分类，它将学习所有包含特征的节点然后用一个包含邻域信息的 d 维向量来 hv 来表示节点，从而利用这些标记预测其余节点的分类。本文作者使用此网络的前半部分，运行8步 GNN，以获得所需上下文和目标表达式的表示。
     > We then run a graph neural network for 8 steps to obtain representations for all nodes in the graph, allowing us to read out a representation for the “hole” (from the introduced dummy node) and for all variables in context.
@@ -124,9 +124,25 @@ $$p(a|c) = \prod_{t} p(a_t|c,a_{<t})$$
 
        ![img](1.png)
 
-       其中 g 函数是 GGNN 的节点输出函数， 左边的参数是节点初态，右边参数是节点输入特征。
+       * 其中 g 函数是 GGNN 的节点输出函数， 左边的参数是节点初态，右边参数是节点输入特征。
 
-       **TODO** 解释公式中的 emb() 和 f()
+       * emb(Index)函数为参考嵌入层（Embedding layer）而构造学习的一个单射的映射函数。其目的在于把正整数（Index）转换为固定大小的**稠密向量**。
+         - **这里使用emb函数的原因主要有两个：**
+            - 独热编码（One-hot encoding）向量是**高维且稀疏的**。对于序列数量较多情况下，使用独热编码时，所映射成的向量中有num-1个元素都为0（num为序列数），在大数据集下使用这种方法的计算效率是很低的。
+            - 每个嵌入向量会在训练神经网络时更新。对于任何能够通过使用嵌入层而把它变成向量的东西，为了方便计算，进行向量映射是明智的选择。
+         - **Embedding作用在词语上的一个例子：**
+            >“deep learning is very deep”
+
+          - 使用嵌入层的第一步是通过索引对这个句子进行编码，在这个例子里，我们给句中每个不同的词一个数字索引，编码后的句子如下所示：
+            >1 2 3 4 1
+
+          - 下一步是创建嵌入矩阵。我们要决定每个索引有多少“潜在因素”，这就是说，我们需要决定词向量的长度。一般我们会使用像 32 或者 50 这样的长度。出于可读性的考虑，假设我们每个索引的“潜在因素”个数有 6 个。那么嵌入矩阵就如下图所示：
+            ![img](embedding-matrix.png)
+          - 所以，和独热编码中每个词向量的长度相比，使用嵌入矩阵能够让每个词向量的长度大幅缩短。简而言之，我们用一个向量 [.32, .02, .48, .21, .56, .15]来代替了词语“deep”。然而并不是每个词被一个向量所代替，而是由其索引在嵌入矩阵中对应的向量代替。
+      - f函数是通过学习得到的一个映射函数，它的作用是：
+        >输入一条边的源结点的属性表示h_ui (以ui为源结点)
+
+        >输出其对应的边缘类型ti
 
 ## 实现
 
