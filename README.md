@@ -37,6 +37,7 @@
     **TODO** 反例
     * 基于枚举和演绎的程序综合工具成功地生成了满足某些（通常是不完整）形式的规范程序，但是在人工手动检查中通常显然是错误的，因为它们无法将可能的程序与可能的“自然”程序区分开。
         > For example, program synthesis tools based on enumeration and deduction (Solar-Lezama, 2008; Polozov & Gulwani, 2015; Feser et al., 2015; Feng et al., 2018) are successful at generating programs that satisfy some (usually incomplete) formal speciﬁcation but are often obviously wrong on manual inspection, as they cannot distinguish unlikely from likely, “natural” programs.
+
     * 另一方面，学习后的代码模型能够成功生成十分逼真的程序。 但是，这些程序经常在语义上并不相关，例如，因为变量使用并不统一。
         > On the otherhand,learned code models have succeeded in generating realistic-looking programs(Maddison & Tarlow, 2014; Bielik et al., 2016; Parisotto et al., 2017; Rabinovich et al., 2017; Yin & Neubig, 2017). However,these programs often fail to be semantically relevant,for example because variables are not used consistently.
 
@@ -48,6 +49,8 @@
 
     本文使用了建立抽象语法树的基本思路，并依据编程语言的语法来有序扩展语法树，通过每次扩展语法树最底层，最左边的非终结节点来有序构造。因为每次扩展的节点的相对位置一定，所以作者将代码产生问题简化为了树扩展序列的分类问题。
     > The key idea is to construct the AST a sequentially, by expanding one node at a time using production rules from the underlying programming language grammar. This simpliﬁes the code generation task to a sequence of classiﬁcation problems ...
+
+    ![img](summarize.png)
 
 ## 方案
 
