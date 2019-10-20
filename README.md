@@ -213,7 +213,12 @@
   
 ##   评价
   
+  本文的模型为nag，作者考虑了四个度量，分别为：pre-token 困惑度，生成基本事实表达式的频率，生成的表达式类型正确的频率（束率为1和5），通过这四个指标，作者将本模型和之前的 asn tree模型作比较。并设置了两组使用不同编码器（g 和 seq）的比较组。
+  >To evaluate this, we consider four metrics. As our ExprGen task requires a conditional language model of code, we first consider the per-token perplexity of the model; the lower the perplexity, the better the model fits the real data distribution. We then evaluate how often the generated expression is well-typed (i.e., can be typed in the original code context). We report these metrics for the most likely expression returned by beam search decoding with beam width 5. Finally, we compute how often the ground truth expression was generated (reported for the most likely expression, as well as for the top five expressions).
   
+  * 困惑度： 使用无分类标签的测试数据集，用训练出来的模型来跑测试数据集，然后计算在测试数据集上，所有token似然值几何平均数的倒数，也就是perplexity指标，这个指标可以直观理解为用于生成测试数据集的词表大小的期望值，其公式如下：
+  
+  ![img](perplexity.png)
   
 ##   局限
   
