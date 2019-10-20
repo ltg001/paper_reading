@@ -1,4 +1,5 @@
-#  Generative Code Modeling With Graphs
+#   Generative Code Modeling With Graphs
+  
   
   
 题目：Generative Code Modeling With Graphs
@@ -6,7 +7,8 @@
 单位：Microsift Research
 出版：ICLR-2019
   
-##  问题
+##   问题
+  
   
   
 **TODO** 为每个任务配上例子
@@ -24,7 +26,12 @@
   
 > a new code generation task focused on generating small but semantically complex expressions conditioned on source code context.
   
-###  研究背景
+* 应用场景：
+  * 在有上下文的情况下快速进行代码重构和相关修复
+  * 可以快速进行 code review 时的 refactor，提供代码替换选项
+  
+###   研究背景
+  
   
   
 1. 基于自然语言和形式语言的研究
@@ -40,36 +47,40 @@
     **TODO** 反例
     * 基于枚举和演绎的程序综合工具成功地生成了满足某些（通常是不完整）形式的规范程序，但是在人工手动检查中通常显然是错误的，因为它们无法将可能的程序与可能的“自然”程序区分开。
         > For example, program synthesis tools based on enumeration and deduction (Solar-Lezama, 2008; Polozov & Gulwani, 2015; Feser et al., 2015; Feng et al., 2018) are successful at generating programs that satisfy some (usually incomplete) formal speciﬁcation but are often obviously wrong on manual inspection, as they cannot distinguish unlikely from likely, “natural” programs.
-
+  
     * 另一方面，学习后的代码模型能够成功生成十分逼真的程序。 但是，这些程序经常在语义上并不相关，例如，因为变量使用并不统一。
         > On the otherhand,learned code models have succeeded in generating realistic-looking programs(Maddison & Tarlow, 2014; Bielik et al., 2016; Parisotto et al., 2017; Rabinovich et al., 2017; Yin & Neubig, 2017). However,these programs often fail to be semantically relevant,for example because variables are not used consistently.
   
 2. 抽象语法树相关的研究
-   因为语法树保证了语法信息的正确性，所以可以通过目标语言的语法来构建抽象语法树来解决语法信息的正确问题。
+   因为语法树保证了语法信息的正确性，所以可以通过目标语言的语法来构建抽象语法树来解决语法信息的正确问题。相比之前的工作，这种方法使用了目标语言的语法树，从根本上解决了语法错误的问题。
    > using the target language’s grammar to generate abstract syntax trees
   
    ![img](AST.png )
   
-    本文使用了建立抽象语法树的基本思路，并依据编程语言的语法来有序扩展语法树，通过每次扩展语法树最底层，最左边的非终结节点来有序构造。因为每次扩展的节点的相对位置一定，所以作者将代码产生问题简化为了树扩展序列的分类问题。
+    本文使用了建立抽象语法树的基本思路，并依据编程语言的语法来有序扩展语法树，通过每次扩展语法树最底层，最左边的非终结节点来有序构造。因为每次扩展的节点的相对位置一定（一般是最底层的最左边的非终结节点），序列构成最左或最右推导，所以作者将代码产生问题简化为了树扩展序列的分类问题。
     > The key idea is to construct the AST a sequentially, by expanding one node at a time using production rules from the underlying programming language grammar. This simpliﬁes the code generation task to a sequence of classiﬁcation problems ...
-
-    ![img](summarize.png)
-
-## 方案
-
-### 系统架构
-
-   本文使用了经典的 encoder-decoder 结构，将提取到的上下文信息先表示为一个向量，再逐步将其展开并生成目标代码。encoder 非本文所解决问题，本文选择 seq 和 G 两种encode 方式，decoder则使用改良的 AST generating model，作者结合属性文法，将AST 节点和代表继承属性和综合属性的节点连接形成图，最后使用GNN学习此图来进行代码生成。
+  
+    ![img](summarize.png )
+  
+##  方案
+  
+  
+###  系统架构
+  
+  
+   本文使用了经典的 encoder-decoder 结构，将提取到的上下文信息先表示为一个向量，再逐步将其展开并生成目标代码。encoder 非本文所解决问题，本文选择 seq 和 G 两种encode 方式，decoder 则使用改良的 AST generating model，作者结合属性文法，将 AST 节点和代表继承属性和综合属性的节点连接形成图，最后使用 GNN （图神经网络）学习此图来进行代码生成。
   
    > We associate each node in the AST with two fresh nodes representing inherited resp. synthesized information (or attributes).
    > Our method for getRepresentation from Alg. 1 thus factors into two parts: a deterministic procedure that turns a partial AST a<t into a graph by adding additional edges that encode attribute relationships, and a graph neural network that learns from this graph.
   
 **TODO** 假设和使用方案的动机
   
-##  原理
+##   原理
   
   
-###  encoder--decoder模型
+  
+###   encoder--decoder模型
+  
   
   
 原理如图：
@@ -80,27 +91,28 @@
 <p align="center"><img src="https://latex.codecogs.com/gif.latex?p(a|c)%20=%20&#x5C;prod_{t}%20p(a_t|c,a_{&lt;t})"/></p>  
   
   
-####  encoder
+####   encoder
   
   
-**TODO** 确认一下两种 method 的名称是否准确 尽量使用引用文章中的名字
-  
-* Method1 -- Seq
+* Method1 -- Seq （通过序列建模）
     使用 NLP 领域中经典的信息抽取方式 Seq 使用两层双向的 GRU 单元来学习代码空缺处的上下文信息。使用双向的 GRU 单元同时学习空缺前和空缺后的语义信息，选取最后一个单元的状态信息作为传入的上下文信息 c。
     作者使用了第二个上述的结构来学习变量在空缺前后的变化特征，并使用了上述结构来进行变量的表示学习，即将第二层的 GRU 最终状态信息经过平均池化后作为每个变量的向量表示。所以每一层的 GRU 单元数就是描述变量的个数。
-    ![img](seq.png ) // **TODO** 换张图表示嵌入
+    <div><img src="seq.png" height='300'></div>  
+  
+    **TODO** 换张图表示嵌入
   
   * 为什么使用 GRU?
     * RNN：每一层的基本单元只进行 tanh 或 relu 操作，如果网络层次太深的话，此时会产生梯度消失或梯度下降问题。这种神经网络带有环，使网络有了一定的信息持久化能力，但是不能解决较为复杂的信息的持久化问题。
     * LSTM：可以在解决梯度消失和梯度爆炸的问题，还可以从语料中学习到长期依赖关系。但是参数较多，不容易训练且容易过拟合。
     * GRU：将遗忘门和输入门合并成为单一的“更新门”，在拥有 LSTM 网络功能的基础上进行了适当的简化。相对 LSTM 引入了更少的参数，所以网络不容易过拟合且易于训练。
   
-* Method2 -- G
+* Method2 -- G （使用图来建模）
     基于由 Allamanis 等人提出的程序图方法，将程序转化为图，并用一个虚拟节点代替目标表达式。通过 GNN 获得上下文和填空区域（即目标表达式）的所有变量表示。
-    其中 GNN 是运行在图上的神经网络算法，其典型应用是节点分类，它将学习所有包含特征的节点然后用一个包含邻域信息的 d 维向量来 hv 来表示节点，从而利用这些标记预测其余节点的分类。本文作者使用此网络的前半部分，运行8步 GNN，以获得所需上下文和目标表达式的表示。
+    其中 GNN 是运行在图上的神经网络算法，其典型应用是节点分类，它将学习所有包含特征的节点然后用一个包含邻域信息的 d 维向量来 hv 来表示节点，从而利用这些标记预测其余节点的分类。本文作者使用此网络的前半部分，使用 GNN，以获得所需上下文和目标表达式的表示。
+    **TODO** 描述做法 https://arxiv.org/abs/1711.00740
     > We then run a graph neural network for 8 steps to obtain representations for all nodes in the graph, allowing us to read out a representation for the “hole” (from the introduced dummy node) and for all variables in context.
   
-####  decoder
+####   decoder
   
   
    本文选择使用 AST 生成算法，构建一棵 AST 树，每次将最左最下的非终结节点扩张。
@@ -129,13 +141,16 @@
   * GGNN 是一种基于 GRU 的经典的空间域 message passing 的模型，实现每一次参数更新时，每个节点既接受相邻节点的信息，又向相邻节点发送信息。
        GGNN 图示：
   
-       ![img](GGNN.png )
+       <div align=center><img src="GGNN.png" height='200'></div> **TODO** 有点模糊 重新画个图
   
        属性 hv 公式：
+        <div align=center><img src="1.png"></div>
   
-       ![img](1.png )
+    * 其中 g 函数用于更新节点的表示，接受的参数是：嵌入后的该节点的标注（label）信息和有关的边的向量的和经过拼接组成的向量。
+        >  transform them according to the corresponding edge type ti using a learned function fti, aggregate them (by elementwise summation) and combine them with the learned embedding emb(v) of the node label v using a function g
   
-    * 其中 g 函数是 GGNN 的节点输出函数， 左边的参数是节点初态，右边参数是节点输入特征。
+        其中 <img src="https://latex.codecogs.com/gif.latex?h_{u_i}"/> 表示起源于节点 <img src="https://latex.codecogs.com/gif.latex?u_i"/> 的边的向量表示，因为点的标注的嵌入长度和边的嵌入的长度可能不相等，需要训练一个线性层来进行从边的嵌入空间到标注的嵌入空间的转换，但是边的类型不同，在嵌入边时空间也不同，因此每个类型的边需要不同的矩阵来进行转换。
+        上面所说的 label 信息实际上是当前节点上个时刻对这个时刻造成的影响，使用相关的边的向量的和来描述其他节点对当前节点的影响。函数 g 的实际作用在于刻画 GNN 传播的聚合操作，使用 GRU 单元来描述这个时序信息。
   
     * emb(Index)函数为参考嵌入层（Embedding layer）而构造学习的一个单射的映射函数。其目的在于把正整数（Index）转换为固定大小的**稠密向量**。
     * **这里使用emb函数的原因主要有两个：**
@@ -151,22 +166,57 @@
             ![img](embedding-matrix.png )
           所以，和独热编码中每个词向量的长度相比，使用嵌入矩阵能够让每个词向量的长度大幅缩短。简而言之，我们用一个向量 [.32, .02, .48, .21, .56, .15]来代替了词语“deep”。然而并不是每个词被一个向量所代替，而是由其索引在嵌入矩阵中对应的向量代替。
       * f 函数是通过学习得到的一个映射函数，它的作用是：
-        > 输入一条边的源结点的属性表示 <img src="https://latex.codecogs.com/gif.latex?h_{ui}"/> (以ui为源结点)
-        > 输出其对应的边缘类型 <img src="https://latex.codecogs.com/gif.latex?t_i"/>
+        * 输入一条边的源结点的属性表示 <img src="https://latex.codecogs.com/gif.latex?h_{ui}"/> (以 <img src="https://latex.codecogs.com/gif.latex?u_i"/> 为源结点)
+        * 输出其对应的边缘类型 <img src="https://latex.codecogs.com/gif.latex?t_i"/>
+  
+* 边的表示
+    本文中作者使用了一个三元组表示一条有属性的有向边。<img src="https://latex.codecogs.com/gif.latex?&#x5C;lang%20u,t,v%20&#x5C;rang"/> 表示属性为 <img src="https://latex.codecogs.com/gif.latex?t"/> 的从节点 <img src="https://latex.codecogs.com/gif.latex?u"/> 指向节点 <img src="https://latex.codecogs.com/gif.latex?v"/> 的有向边。使用边的属性表示上述的属性文法，通过设置该域为 Child, NextToken 等值描述不同信息流动的方向。需要注意的是对于不同类型的边描述的信息类型不同，在进行向量表示时需要嵌入不同的空间。
+  
+###  算法概述
+  
+  
+1. 使用算法1生成语法驱动的 AST 树，同时根据算法2完成添加边的操作，进而完成建图
+2. 使用 encoder 部分进行文中描述的语法图的根节点的表示和上下文信息
+3. 从根节点开始。重复使用算法2来获得所有节点的向量表示
+4. 从中随机选取部分节点进行更新，因为建立的语法图相对稀疏，可以将其视为小的不连通图，即本次更新的节点和不更新的节点无关。因此训练时的 batch size 将对模型的泛化性能产生较大的影响。
+5. 使用最大似然函数对产生结果进行评定，产生对应的损失函数。
+  
+####  完成任务
+  
+  
+1. 选择展开式
+    根据当前展开节点的标注 <img src="https://latex.codecogs.com/gif.latex?l_v"/> 和节点状态 <img src="https://latex.codecogs.com/gif.latex?h_v"/> 在给定的目标语言的产生式的集合中选取得到条件概率最大的产生式即可。
+    <p align="center"><img src="https://latex.codecogs.com/gif.latex?&#x5C;mathrm{pickPrduction}%20=%20&#x5C;argmax%20P(rule|l_v,%20h_v)"/></p>  
+  
+2. 选择涉及的变量
+    根绝当前展开节点的状态 <img src="https://latex.codecogs.com/gif.latex?h_v"/> 在变量集合 <img src="https://latex.codecogs.com/gif.latex?&#x5C;Gamma"/> 选择条件概率最大的变量。其中嵌入节点和变量的 embedding layer 是独立的。在得到了每个变量的向量表示后通过 Pointer Network（一种特殊的 attention 机制的 Seq2Seq 网络）进行更新。 **TODO** 怎么更新？
+    <p align="center"><img src="https://latex.codecogs.com/gif.latex?&#x5C;mathrm{pickVariable}(&#x5C;Gamma,%20h_v)%20=%20&#x5C;argmax_{var%20&#x5C;in%20&#x5C;Gamma}%20P(var|h_v)"/></p>  
+  
+    * Pointer Network
+        传统的带有注意力机制的 seq2seq 模型的运行过程是这样的，先使用 encoder 部分对输入序列进行编码，然后对编码后的向量做 attention，最后使用 decoder 部分对 attention 后的向量进行解码从而得到预测结果。但是作为 Pointer Networks，得到预测结果的方式便是输出一个概率分布，也即所谓的指针。换句话说，传统带有注意力机制的 seq2seq 模型输出的是针对输出词汇表的一个概率分布，而 Pointer Networks 输出的则是针对输入文本序列的概率分布。
+      * 可以观察到输出元素来自输入元素的特点，Pointer Networks 特别适合用来直接复制输入序列中的某些元素给输出序列。
+3. 选择式子中具体的字符表示
+    在训练过程中产生认识的字符集合 <img src="https://latex.codecogs.com/gif.latex?&#x5C;Delta"/> 并使用另一个 Pointer Network 来整合有效域中不认识的字符 <img src="https://latex.codecogs.com/gif.latex?t_1%20&#x5C;dots%20t_T"/> 并在这些字符中选择条件概率最大的。实际上在训练时遇到 <img src="https://latex.codecogs.com/gif.latex?t_1%20&#x5C;dots%20t_T"/> 字符时会统一转换为 UNK 标记，这也对应 NLP 任务中的 OOV(out of vocabulary) 问题，造成一定的性能损失。
+    <p align="center"><img src="https://latex.codecogs.com/gif.latex?&#x5C;mathrm{pickLiteral}(&#x5C;Gamma,%20h_v)%20=%20&#x5C;argmax_{lit%20&#x5C;in%20&#x5C;Delta%20&#x5C;cup&#x5C;{t_1&#x5C;dots%20t_T&#x5C;}}%20P(lit|h_v)"/></p>  
+  
+    这是唯一的可以产生模型不认识的字符的方法。
   
 ##  实现
   
   
-   实现使用框架为 TensorFlow，所生成代码为 C#。[代码github](https://github.com/Microsoft/graph-based-code-modelling )
+   实现使用框架为 TensorFlow，所生成代码为 C#。类似的任务生成的代码都主要是 C# 和 java 原因在于有公认的编码规范，不会因为代码风格问题造成额外的复杂度。[代码github](https://github.com/Microsoft/graph-based-code-modelling )
    > We have released the code for this on https://github.com/Microsoft/graph-based-code-modelling.
   
-###  模型构建
+###   模型构建
   
   
-##  评价
+  
+##   评价
   
   
-##  局限
+  
+##   局限
+  
   
   
 1. 产生代码的类型受限，不支持用户自定的类型。
@@ -175,8 +225,10 @@
 2. 模型对数据集的依赖较大，训练好的模型在新的数据集上表现不好。文中指出本问题出现的根源是新数据集中存在原先项目中没有出现过的新词汇，可以认为是 NLP 任务中常见的 OOV (out of vocabulary) 问题导致的结果恶化。
    > Transferring a trained model to unseen projects with a new project-specific vocabulary substantially worsens results, as expected.
   
-##  展望
+##   展望
   
   
 1. 由于上述局限1提出的在用户自定类型上的学习不足导致生成代码的变量类型受限，可以使用和提取变量信息类似的方法，专门将定义类型的代码进行嵌入，使用来代表新的类型。但是由于定义类型使用的代码数量较少难以训练，可以先学习基础类型（整型，浮点型等）的向量表示，将此问题转化为一个 transfer learning 的相关问题。
+  
+**TODO** 翻译文中的 additional improvement 部分
   
