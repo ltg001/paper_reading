@@ -82,26 +82,35 @@ embedding(Index)函数为参考嵌入层（Embedding layer）而构造学习的�
     ![img](embedding-matrix.png )
     所以 和独热编码中每个词向量的长度相比，使用嵌入矩阵能够让每个词向量的长度大幅缩短。简而言之，我们用一个向量 [0.32, 0.02, 0.48, 0.21, 0.56, 0.15]来代替了词语 “deep”。然而并不是每个词被一个向量所代替，而是由其索引在嵌入矩阵中对应的向量代替。
 
+### 注意力机制 attention mechanism
+
+在使用 encoder-decoder 模型时，要求将所有的信息全部编码成为一个固定长度的向量，造成一个自然的问题就是越靠句子后面的部分获得的神经网络的关注越大，造成了语义的损失。attention 机制的输出是一个向量的序列，而在解码的时候，每一步都会选择性的从向量序列中挑选一个子集进行进一步处理。
+在正常预测时，使用的公式为 $p(y_i|y_1, \dots y_{i-1}, X) = g(y_{i-1}, s_i, c_i)$ 其中 $s_i$ 为 i 时刻的隐藏状态，来源于上一时刻的输入和隐藏状态。  
+可以注意到这里的每个目标的输出 $y_i$ 均和相应的内容向量 $c_i$ 相关而不是使用统一的内容向量 $c$ ，计算方法如下：
+$$c_i = \sum_{j=1}^{T_x} \alpha_{ij}h_{j}$$
+通过每一时刻独立计算不同向量在网络中比重来解决长短时信息依赖的问题。
+
+![img](attention.png)
+
 ##  方案
   
 ###  系统架构
-  
   
    本文使用了经典的 encoder-decoder 结构，将提取到的上下文信息先表示为一个向量，再逐步将其展开并生成目标代码。encoder 非本文所解决问题，本文选择 seq 和 G 两种encode 方式，decoder 则使用改良的 AST generating model，作者结合属性文法，将 AST 节点和代表继承属性和综合属性的节点连接形成图，最后使用 GNN （图神经网络）学习此图来进行代码生成。
   
    > We associate each node in the AST with two fresh nodes representing inherited resp. synthesized information (or attributes).
    > Our method for getRepresentation from Alg. 1 thus factors into two parts: a deterministic procedure that turns a partial AST a<t into a graph by adding additional edges that encode attribute relationships, and a graph neural network that learns from this graph.
   
-**TODO** 假设和使用方案的动机
+* 为什么使用 encoder-decoder？
+  * 高效处理变长序列问题  
+        先将输入转化为一个固定长度的向量再通过 decoder 进行解码，将之前输出的固定长度的向量转化成为输出序列。
+  * 降维
+        为了处理序列问题，对于 t 时刻，应当将前 t-1 时刻的数据全部重新训练。通过 encoder-decoder 模型，综合之前 t-1 时刻的信息，成功降低中间数据的维度。
   
-##   原理
-  
-  
-  
-###   encoder--decoder模型
-  
-  
-  
+## 原理
+
+### encoder--decoder模型
+
 原理如图：
   
 ![img](model_sketch.png )
@@ -110,15 +119,13 @@ embedding(Index)函数为参考嵌入层（Embedding layer）而构造学习的�
 <p align="center"><img src="https://latex.codecogs.com/gif.latex?p(a|c)%20=%20&#x5C;prod_{t}%20p(a_t|c,a_{&lt;t})"/></p>  
   
   
-####   encoder
+#### encoder
   
   
 * Method1 -- Seq （通过序列建模）
     使用 NLP 领域中经典的信息抽取方式 Seq 使用两层双向的 GRU 单元来学习代码空缺处的上下文信息。使用双向的 GRU 单元同时学习空缺前和空缺后的语义信息，选取最后一个单元的状态信息作为传入的上下文信息 c。
     作者使用了第二个上述的结构来学习变量在空缺前后的变化特征，并使用了上述结构来进行变量的表示学习，即将第二层的 GRU 最终状态信息经过平均池化后作为每个变量的向量表示。所以每一层的 GRU 单元数就是描述变量的个数。
     <div><img src="seq.png" height='300'></div>  
-  
-    **TODO** 换张图表示嵌入
   
   * 为什么使用 GRU?
     * RNN：每一层的基本单元只进行 tanh 或 relu 操作，如果网络层次太深的话，此时会产生梯度消失或梯度下降问题。这种神经网络带有环，使网络有了一定的信息持久化能力，但是不能解决较为复杂的信息的持久化问题。
@@ -131,7 +138,7 @@ embedding(Index)函数为参考嵌入层（Embedding layer）而构造学习的�
     **TODO** 描述做法 https://arxiv.org/abs/1711.00740
     > We then run a graph neural network for 8 steps to obtain representations for all nodes in the graph, allowing us to read out a representation for the “hole” (from the introduced dummy node) and for all variables in context.
   
-####   decoder
+#### decoder
 
    本文选择使用 AST 生成算法，构建一棵 AST 树，每次将最左最下的非终结节点扩张，在构建树的同时进行建图操作。
    > by fixing the order of the sequence to always expand the left-most, bottom-most nonterminal node.
@@ -159,7 +166,7 @@ embedding(Index)函数为参考嵌入层（Embedding layer）而构造学习的�
   * GGNN 是一种基于 GRU 的经典的空间域 message passing 的模型，实现每一次参数更新时，每个节点既接受相邻节点的信息，又向相邻节点发送信息。
        GGNN 图示：
   
-       <div align=center><img src="GGNN.png" height='200'></div> **TODO** 有点模糊 重新画个图
+       <div align=center><img src="GGNN.png" height='200'></div>
   
        属性 hv 公式：
         <div align=center><img src="1.png"></div>
@@ -190,18 +197,21 @@ embedding(Index)函数为参考嵌入层（Embedding layer）而构造学习的�
   
 1. 选择展开式
     根据当前展开节点的标注 <img src="https://latex.codecogs.com/gif.latex?l_v"/> 和节点状态 <img src="https://latex.codecogs.com/gif.latex?h_v"/> 在给定的目标语言的产生式的集合中选取得到条件概率最大的产生式即可。
-    <p align="center"><img src="https://latex.codecogs.com/gif.latex?&#x5C;mathrm{pickPrduction}%20=%20&#x5C;argmax%20P(rule|l_v,%20h_v)"/></p>  
+
+    $$\mathrm{pickProduction}=P(rule|l_v, h_v)$$
   
 2. 选择涉及的变量
     根绝当前展开节点的状态 <img src="https://latex.codecogs.com/gif.latex?h_v"/> 在变量集合 <img src="https://latex.codecogs.com/gif.latex?&#x5C;Gamma"/> 选择条件概率最大的变量。其中嵌入节点和变量的 embedding layer 是独立的。在得到了每个变量的向量表示后通过 Pointer Network（一种特殊的 attention 机制的 Seq2Seq 网络）进行更新。 **TODO** 怎么更新？
-    <p align="center"><img src="https://latex.codecogs.com/gif.latex?&#x5C;mathrm{pickVariable}(&#x5C;Gamma,%20h_v)%20=%20&#x5C;argmax_{var%20&#x5C;in%20&#x5C;Gamma}%20P(var|h_v)"/></p>  
+
+    $$\mathrm{pickVariable}(\Gamma, h_v) = \argmax_{var \in \Gamma} P(var|h_v)$$
   
     * Pointer Network
         传统的带有注意力机制的 seq2seq 模型的运行过程是这样的，先使用 encoder 部分对输入序列进行编码，然后对编码后的向量做 attention，最后使用 decoder 部分对 attention 后的向量进行解码从而得到预测结果。但是作为 Pointer Networks，得到预测结果的方式便是输出一个概率分布，也即所谓的指针。换句话说，传统带有注意力机制的 seq2seq 模型输出的是针对输出词汇表的一个概率分布，而 Pointer Networks 输出的则是针对输入文本序列的概率分布。
       * 可以观察到输出元素来自输入元素的特点，Pointer Networks 特别适合用来直接复制输入序列中的某些元素给输出序列。
 3. 选择式子中具体的字符表示
     在训练过程中产生认识的字符集合 <img src="https://latex.codecogs.com/gif.latex?&#x5C;Delta"/> 并使用另一个 Pointer Network 来整合有效域中不认识的字符 <img src="https://latex.codecogs.com/gif.latex?t_1%20&#x5C;dots%20t_T"/> 并在这些字符中选择条件概率最大的。实际上在训练时遇到 <img src="https://latex.codecogs.com/gif.latex?t_1%20&#x5C;dots%20t_T"/> 字符时会统一转换为 UNK 标记，这也对应 NLP 任务中的 OOV(out of vocabulary) 问题，造成一定的性能损失。
-    <p align="center"><img src="https://latex.codecogs.com/gif.latex?&#x5C;mathrm{pickLiteral}(&#x5C;Gamma,%20h_v)%20=%20&#x5C;argmax_{lit%20&#x5C;in%20&#x5C;Delta%20&#x5C;cup&#x5C;{t_1&#x5C;dots%20t_T&#x5C;}}%20P(lit|h_v)"/></p>  
+
+    $$\mathrm{pickLiteral}(\Gamma, h_v) = \argmax_{lit \in \Delta \cup {t_1\dots t_T}} P(lit|h_v)$$
   
     这是唯一的可以产生模型不认识的字符的方法。
   
@@ -241,10 +251,8 @@ embedding(Index)函数为参考嵌入层（Embedding layer）而构造学习的�
   
   
 1. 由于上述局限1提出的在用户自定类型上的学习不足导致生成代码的变量类型受限，可以使用和提取变量信息类似的方法，专门将定义类型的代码进行嵌入，使用来代表新的类型。但是由于定义类型使用的代码数量较少难以训练，可以先学习基础类型（整型，浮点型等）的向量表示，将此问题转化为一个 transfer learning 的相关问题。
-  
-**TODO** 翻译文中的 additional improvement 部分
 
-2. 使用注意机制扩展了pickProduction函数，但是通过实验分析，同样方法并不适用于函数pickVariable和pickLiteral。 
+2. 使用注意机制扩展了pickProduction函数，但是通过实验分析，同样方法并不适用于函数pickVariable和pickLiteral。 **TODO** 核实情况
 
 3. 更改了对某些种类的边生成的规定，并以此扩展了状态hv的生成方程式。
 
