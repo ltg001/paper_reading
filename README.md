@@ -17,6 +17,9 @@
   
 > The most general form of the code generation task is to produce a (partial) program in a programming language given some context information c.
   
+   ![img](exp_1.png)
+   上图是本篇论文用以评测而生成的代码段，在这里以描述主要任务的例子的形式呈现。
+  
 * 上下文信息的形式
   * 自然语言
   * 输入输出的样例
