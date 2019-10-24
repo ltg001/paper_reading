@@ -249,15 +249,17 @@ $$c_i = \sum_{j=1}^{T_x} \alpha_{ij}h_{j}$$
 2. 模型对数据集的依赖较大，训练好的模型在新的数据集上表现不好。文中指出本问题出现的根源是新数据集中存在原先项目中没有出现过的新词汇，可以认为是 NLP 任务中常见的 OOV (out of vocabulary) 问题导致的结果恶化。
    > Transferring a trained model to unseen projects with a new project-specific vocabulary substantially worsens results, as expected.
   
+3. 只有pickProduction函数可以使用注意机制扩展，而函数pickVariable和pickLiteral由于高度依赖于上下文信息，同样方法并不适用于它们。
+
+4. pickProduction函数无法保证源和派生的一对一的关系，会使生成有二义性。
+
 ##   展望
   
   
 1. 由于上述局限1提出的在用户自定类型上的学习不足导致生成代码的变量类型受限，可以使用和提取变量信息类似的方法，专门将定义类型的代码进行嵌入，使用来代表新的类型。但是由于定义类型使用的代码数量较少难以训练，可以先学习基础类型（整型，浮点型等）的向量表示，将此问题转化为一个 transfer learning 的相关问题。
 
-2. 使用注意机制扩展了pickProduction函数，但是通过实验分析，同样方法并不适用于函数pickVariable和pickLiteral。 **TODO** 核实情况
+ **TODO** 核实情况
 
-3. 更改了对某些种类的边生成的规定，并以此扩展了状态hv的生成方程式。
 
-4. 除了以上所述，为了保证节点和边的生成过程中还能考虑到有关可用变量的信息，再次对pickProduction函数进行了扩展。这种扩展可以保证源和派生的一对一的关系，并且在诸如Expr =⇒Expr.Length之类的生成情况下很有用。
 
 
