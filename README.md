@@ -140,9 +140,13 @@ $$c_i = \sum_{j=1}^{T_x} \alpha_{ij}h_{j}$$
 * Method2 -- G （使用图来建模）
     基于由 Allamanis 等人提出的程序图方法，将程序转化为图，并用一个虚拟节点代替目标表达式。通过 GNN 获得上下文和填空区域（即目标表达式）的所有变量表示。
     其中 GNN 是运行在图上的神经网络算法，其典型应用是节点分类，它将学习所有包含特征的节点然后用一个包含邻域信息的 d 维向量来 hv 来表示节点，从而利用这些标记预测其余节点的分类。本文作者使用此网络的前半部分，使用 GNN，以获得所需上下文和目标表达式的表示。
-    **TODO** 描述做法 https://arxiv.org/abs/1711.00740
+    在GNN中，图是由一个结点集合，一个结点标签（特征）向量集合和一个图中边的种类集合。生成图中所有结点的representations的具体步骤如下：
+    1、通过结点的标签向量，为每个结点初始化一个状态向量。
+    2、通过一个随机函数，同时将每个点的状态向量映射为发往该点邻接点的信息。
+    3、每个结点通过GRU函数（GUR函数的输入有个参数，一为每个结点收到的信息的聚合和，二为该节点当前状态向量），同时更新自己的状态向量。
+    4、再重复步骤2，3共7次后，得到的每个结点的状态向量为每个结点的representation。 
     > We then run a graph neural network for 8 steps to obtain representations for all nodes in the graph, allowing us to read out a representation for the “hole” (from the introduced dummy node) and for all variables in context.
-  
+
 #### decoder
 
    本文选择使用 AST 生成算法，构建一棵 AST 树，每次将最左最下的非终结节点扩张，在构建树的同时进行建图操作。
