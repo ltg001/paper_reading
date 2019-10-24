@@ -11,9 +11,8 @@
   
   
   
-  **TODO** 加例子
 主要任务：根据给出的上下文信息 c 来产生符合相应描述的代码段。
-  
+    **TODO** 加例子
 > The most general form of the code generation task is to produce a (partial) program in a programming language given some context information c.
   
 * 上下文信息的形式
