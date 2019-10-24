@@ -17,7 +17,7 @@
 > The most general form of the code generation task is to produce a (partial) program in a programming language given some context information c.
   
    ![img](sample1.png)
-   上图为主要任务的例子，该代码生成模型的主要任务就是将图中阴影部分周围的代码作为context information c，来生成阴影部分的代码。
+   上图为主要任务的例子，该代码生成模型的主要任务就是将图中阴影部分周围的代码信息作为context information c，来生成阴影部分的代码。
   
 * 上下文信息的形式
   * 自然语言
