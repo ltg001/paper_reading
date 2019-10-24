@@ -11,14 +11,13 @@
   
   
   
-**TODO** 为每个任务配上例子
   
 主要任务：根据给出的上下文信息 c 来产生符合相应描述的代码段。
   
 > The most general form of the code generation task is to produce a (partial) program in a programming language given some context information c.
   
-   ![img](exp_1.png)
-   上图是本篇论文用以评测而生成的代码段，在这里以描述主要任务的例子的形式呈现。
+   ![img](sample1.png)
+   上图为主要任务的例子，该代码生成模型的主要任务就是将图中阴影部分周围的代码作为context information c，来生成阴影部分的代码。
   
 * 上下文信息的形式
   * 自然语言
@@ -29,6 +28,8 @@
   
 > a new code generation task focused on generating small but semantically complex expressions conditioned on source code context.
   
+  ![img](sample2.png)
+  上图为任务ExpeGen的例子，阴影部分就是要生成的语义复杂的表达式。
 * 应用场景：
   * 在有上下文的情况下快速进行代码重构和相关修复
   * 可以快速进行 code review 时的 refactor，提供代码替换选项
