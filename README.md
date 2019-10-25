@@ -12,7 +12,7 @@
   
   
 主要任务：根据给出的上下文信息 c 来产生符合相应描述的代码段。
-    **TODO** 加例子
+
 > The most general form of the code generation task is to produce a (partial) program in a programming language given some context information c.
   
 * 上下文信息的形式
@@ -44,7 +44,7 @@
         > as they cannot distinguish unlikely from likely
         > sometimes fail to produce syntactically correct code
   
-    **TODO** 反例
+  
     * 基于枚举和演绎的程序综合工具成功地生成了满足某些（通常是不完整）形式的规范程序，但是在人工手动检查中通常显然是错误的，因为它们无法将可能的程序与可能的“自然”程序区分开。
         > For example, program synthesis tools based on enumeration and deduction (Solar-Lezama, 2008; Polozov & Gulwani, 2015; Feser et al., 2015; Feng et al., 2018) are successful at generating programs that satisfy some (usually incomplete) formal speciﬁcation but are often obviously wrong on manual inspection, as they cannot distinguish unlikely from likely, “natural” programs.
   
