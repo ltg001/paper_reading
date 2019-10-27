@@ -210,7 +210,7 @@ $$c_i = \sum_{j=1}^{T_x} \alpha_{ij}h_{j}$$
     $$\mathrm{pickProduction}=P(rule|l_v, h_v)$$
   
 2. 选择涉及的变量
-    根绝当前展开节点的状态 <img src="https://latex.codecogs.com/gif.latex?h_v"/> 在变量集合 <img src="https://latex.codecogs.com/gif.latex?&#x5C;Gamma"/> 选择条件概率最大的变量。其中嵌入节点和变量的 embedding layer 是独立的。在得到了每个变量的向量表示后通过 Pointer Network（一种特殊的 attention 机制的 Seq2Seq 网络）进行更新。 **TODO** 怎么更新？
+    根绝当前展开节点的状态 <img src="https://latex.codecogs.com/gif.latex?h_v"/> 在变量集合 <img src="https://latex.codecogs.com/gif.latex?&#x5C;Gamma"/> 选择条件概率最大的变量。其中嵌入节点和变量的 embedding layer 是独立的。在得到了每个变量的向量表示后通过 Pointer Network（一种特殊的 attention 机制的 Seq2Seq 网络）进行更新。
 
     $$\mathrm{pickVariable}(\Gamma, h_v) = \argmax_{var \in \Gamma} P(var|h_v)$$
   
@@ -236,8 +236,6 @@ $$c_i = \sum_{j=1}^{T_x} \alpha_{ij}h_{j}$$
 
 * 代码编写不规范：许多项目开发人员在编写代码时, 没有按照统一的规范来开发, 尤其在注释书写上有很大的差异性。
 * 存在大量相似甚至重复的代码片段。在项目开发过程中，由于重载或重写机制，许多代码片段十分相似，这就导致在模型的训练过程中容易出现过拟合现象。
-  
-###   模型构建
   
 ##   评价
   
