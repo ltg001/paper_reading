@@ -36,7 +36,6 @@
    自然语言类似的方法可以在源代码上取得一定的效果。许多语言模型通过计算每一个词基于已经生成的词的条件概率来计算整个代码片段的概率分布。在软件工程和语义分析上取得一定成就。
    > shown successes on important software engineering tasks(Raychevetal.,2015;Bichseletal.,2016; Allamanis et al., 2018b) and semantic parsing (Yin & Neubig, 2017; Rabinovich et al., 2017).
   
-   **TODO** 取得什么成就 & 评价指标
   
     * 缺陷：只能满足部分语法要求，不能区分给定训练样本中的相似程序的不同之处。上下文的语义信息有缺失。
         > as they cannot distinguish unlikely from likely
